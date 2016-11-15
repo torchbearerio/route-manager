@@ -5,10 +5,9 @@ import org.scalatra.sbt.PluginKeys._
 import com.earldouglas.xwp.JettyPlugin
 import com.mojolly.scalate.ScalatePlugin._
 import ScalateKeys._
-import kipsigman.sbt.elasticbeanstalk._
-import com.typesafe.sbt.packager.docker._
-import com.typesafe.sbt.packager.Keys._
-import com.typesafe.sbt.packager.archetypes.JavaAppPackaging
+import sbtassembly.AssemblyPlugin._
+import sbtassembly.AssemblyKeys._
+import sbtassembly.{MergeStrategy, PathList}
 
 object TurkServiceBuild extends Build {
   val Organization = "io.torchbearer"
@@ -17,12 +16,33 @@ object TurkServiceBuild extends Build {
   val ScalaVersion = "2.11.8"
   val ScalatraVersion = "2.4.1"
 
+  val tsAssemblySettings = assemblySettings ++ Seq(
+    // copy web resources to /webapp folder
+    resourceGenerators in Compile <+= (resourceManaged, baseDirectory) map {
+      (managedBase, base) =>
+        val webappBase = base / "src" / "main" / "webapp"
+        for {
+          (from, to) <- webappBase ** "*" x rebase(webappBase, managedBase / "main" / "webapp")
+        } yield {
+          Sync.copy(from, to)
+          to
+        }
+    },
+    assemblyMergeStrategy in assembly := {
+      case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+      case x => MergeStrategy.first
+    },
+    assemblyOutputPath in assembly := file("target/build.jar"),
+    assemblyJarName in assembly := "build.jar",
+    mainClass in assembly := Some("io.torchbearer.turkservice.JettyLauncher")
+  )
+
   lazy val core = ProjectRef(file("../service-core"), "service-core")
 
   lazy val project = Project (
     "turk-service",
     file("."),
-    settings = ScalatraPlugin.scalatraSettings ++ scalateSettings ++ Seq(
+    settings = ScalatraPlugin.scalatraSettings ++ scalateSettings ++ tsAssemblySettings ++ Seq(
       organization := Organization,
       name := Name,
       version := Version,
@@ -38,7 +58,7 @@ object TurkServiceBuild extends Build {
         "org.scalatra" %% "scalatra-scalate" % ScalatraVersion,
         "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
         "ch.qos.logback" % "logback-classic" % "1.1.5" % "runtime",
-        "org.eclipse.jetty" % "jetty-webapp" % "9.2.15.v20160210" % "container",
+        "org.eclipse.jetty" % "jetty-webapp" % "9.2.15.v20160210" % "container;compile",
         "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided",
         "com.typesafe.akka" %% "akka-actor" % "2.3.4",
         "net.databinder.dispatch" %% "dispatch-core" % "0.11.1",
@@ -60,9 +80,6 @@ object TurkServiceBuild extends Build {
         "-Xdebug",
         "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"
       ),
-      dockerExposedPorts := Seq(8080),
-      dockerBaseImage := "java:latest",
-      maintainer := "Johnny Utah <johnny.utah@fbi.gov>",
       scalateTemplateConfig in Compile <<= (sourceDirectory in Compile){ base =>
         Seq(
           TemplateConfig(
@@ -74,7 +91,8 @@ object TurkServiceBuild extends Build {
             Some("templates")
           )
         )
-      }
+      },
+      mainClass in (Compile, run) := Some("io.torchbearer.turkservice.JettyLauncher")
     )
-  ).dependsOn(core).enablePlugins(JettyPlugin, JavaAppPackaging, DockerPlugin, ElasticBeanstalkPlugin)
+  ).dependsOn(core).enablePlugins(JettyPlugin)
 }
