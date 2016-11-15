@@ -1,0 +1,33 @@
+<html>
+<head>
+    <title>Object Sampling</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/imgareaselect-default.css"/>
+    <script src="/static/scripts/vendor/jquery.imgareaselect.pack.js">Function()</script>
+    <script src="/static/scripts/findObject.js">Function()</script>
+    <!-- <script async="true" defer="true" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXyMat0qa3WpiXmjsm7k3x21IGHQlrkv8&amp;callback=initMap">Function()</script> -->
+</head>
+
+<body>
+<div id="left-column">
+    Draw a box just around the <strong>MOST OBVIOUS building, landmark or permanent feature</strong>
+    closest to the <strong>{{instruction}}</strong> in the image.
+    <br/>
+    <br/>
+    <form class="turkForm" action="https://workersandbox.mturk.com/mturk/externalSubmit" method="POST">
+        <input type="hidden" name="assignmentId" value="{{assignmentId}}" />
+        <input type="hidden" name="x1" />
+        <input type="hidden" name="x2" />
+        <input type="hidden" name="y1" />
+        <input type="hidden" name="y2" />
+        <input type="submit" class="button blue" value="Done"/>
+    </form>
+</div>
+
+<div id="right-column">
+    <img id="streetView"
+         src="https://maps.googleapis.com/maps/api/streetview?heading={{bearing}}&amp;size=1500x400&amp;fov=180&amp;location={{lat}},{{long}}&amp;pitch=10&amp;key=AIzaSyCXyMat0qa3WpiXmjsm7k3x21IGHQlrkv8"/>
+</div>
+<div class="clear"></div>
+
+</body>
+</html>

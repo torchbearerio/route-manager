@@ -1,0 +1,23 @@
+<html>
+{{#html}}
+    <head>
+        {{#head}}
+            <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet" />
+            <link rel="stylesheet" type="text/css" href="/static/css/main.css"/>
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+            {{{_}}}
+        {{/head}}
+    </head>
+    <body>
+    <div id="header">
+        Torchbearer
+    </div>
+
+    <div id="content">
+        {{#body}}
+            {{_}}
+        {{/body}}
+    </div>
+    </body>
+{{/html}}
+</html>
