@@ -8,10 +8,13 @@ import ScalateKeys._
 import sbtassembly.AssemblyPlugin._
 import sbtassembly.AssemblyKeys._
 import sbtassembly.{MergeStrategy, PathList}
+import com.earldouglas.xwp.JettyPlugin
+import com.earldouglas.xwp.JettyPlugin.autoImport._
+import com.earldouglas.xwp.ContainerPlugin.autoImport._
 
-object TurkServiceBuild extends Build {
+object RouteManagerBuild extends Build {
   val Organization = "io.torchbearer"
-  val Name = "Turk Service"
+  val Name = "Route Manager"
   val Version = "0.1.0-SNAPSHOT"
   val ScalaVersion = "2.11.8"
   val ScalatraVersion = "2.4.1"
@@ -34,13 +37,13 @@ object TurkServiceBuild extends Build {
     },
     assemblyOutputPath in assembly := file("target/build.jar"),
     assemblyJarName in assembly := "build.jar",
-    mainClass in assembly := Some("io.torchbearer.turkservice.JettyLauncher")
+    mainClass in assembly := Some("io.torchbearer.routemanager.JettyLauncher")
   )
 
   lazy val core = ProjectRef(file("../service-core"), "service-core")
 
   lazy val project = Project (
-    "turk-service",
+    "route-manager",
     file("."),
     settings = ScalatraPlugin.scalatraSettings ++ scalateSettings ++ tsAssemblySettings ++ Seq(
       organization := Organization,
@@ -76,9 +79,10 @@ object TurkServiceBuild extends Build {
           ExclusionRule(organization = "apache-xerces", name = "xml-apis")
         )
       ),
+      containerPort in Jetty := 41011,
       javaOptions ++= Seq(
         "-Xdebug",
-        "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"
+        "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5001"
       ),
       scalateTemplateConfig in Compile <<= (sourceDirectory in Compile){ base =>
         Seq(
@@ -92,7 +96,7 @@ object TurkServiceBuild extends Build {
           )
         )
       },
-      mainClass in (Compile, run) := Some("io.torchbearer.turkservice.JettyLauncher")
+      mainClass in (Compile, run) := Some("io.torchbearer.routemanager.JettyLauncher")
     )
   ).dependsOn(core).enablePlugins(JettyPlugin)
 }
