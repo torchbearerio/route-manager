@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="SBT: org.apache.ws.jaxme:jaxmejs:0.5.2:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.apache.ws.jaxme/jaxmejs/jars/jaxmejs-0.5.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.apache.ws.jaxme/jaxmejs/srcs/jaxmejs-0.5.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

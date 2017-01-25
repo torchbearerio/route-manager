@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="SBT: commons-jelly:commons-jelly-tags-velocity:1.0:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/commons-jelly/commons-jelly-tags-velocity/jars/commons-jelly-tags-velocity-1.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
