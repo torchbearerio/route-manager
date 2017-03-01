@@ -4,7 +4,7 @@ import javax.servlet.ServletContext
 
 import _root_.akka.actor.{ActorSystem, Props}
 import io.torchbearer.ServiceCore.TorchbearerDB
-import io.torchbearer.routemanager.resources.ExecutionPointResource
+import io.torchbearer.routemanager.resources.{ExecutionPointResource, RouteResource}
 
 import scala.concurrent.duration._
 
@@ -15,7 +15,8 @@ class ScalatraBootstrap extends LifeCycle {
 
   override def init(context: ServletContext) {
     // Start REST servers
-    context.mount(new ExecutionPointResource(system), "/executionpoints/*")
+    context.mount(new ExecutionPointResource(system), "/executionpoint/*")
+    context.mount(new RouteResource(system), "/route/*")
 
     // Initialize core services
     TorchbearerDB.init()
