@@ -23,8 +23,10 @@ class TBDirectionsResponse(response: DirectionsResponse) {
       val maneuver = step.getManeuver
 
       val bearing = maneuver.getBearingBefore.toInt
-      val lat = maneuver.getLocation()(0)
-      val long = maneuver.getLocation()(1)
+
+      // NOTE: MapBox is really stupid, and reverses {lat, long} to {long, lat}
+      val lat = maneuver.getLocation()(1)
+      val long = maneuver.getLocation()(0)
 
       ExecutionPoint(lat, long, bearing)
     })

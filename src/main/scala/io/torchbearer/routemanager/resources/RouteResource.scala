@@ -8,7 +8,7 @@ import org.scalatra._
 import org.scalatra.atmosphere._
 import org.scalatra.json.{JValueResult, JacksonJsonSupport}
 import _root_.akka.actor.ActorSystem
-import io.torchbearer.routemanager.types.Route
+import io.torchbearer.routemanager.types.{Route, RouteStatus}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -54,6 +54,10 @@ class RouteResource(system: ActorSystem) extends RouteManagerStack with JacksonJ
       //override val is = Future {
         val route = Route(originLat, originLong, destLat, destLong, saliencyReward, descriptionRewrad, saliencyAssignmentCount,
           descriptionAssignmentCount, distance)
+
+        if (route.status != RouteStatus.OK) {
+          halt(500)
+        }
 
         route.instructionPoints
 

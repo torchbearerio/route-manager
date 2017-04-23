@@ -33,6 +33,7 @@ object RouteManagerBuild extends Build {
     },
     assemblyMergeStrategy in assembly := {
       case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+      case PathList("reference.conf") => MergeStrategy.concat
       case x => MergeStrategy.first
     },
     assemblyOutputPath in assembly := file("target/build.jar"),

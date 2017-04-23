@@ -55,7 +55,7 @@ class Route(
     val keys = instructions.keySet & ingestedPoints.keySet
     this.instructionPoints = keys.map(k => InstructionPoint(ingestedPoints(k), instructions(k))).toList
 
-    // Order instruction points by arrival
+    // Order  instruction points by arrival
     this.instructionPoints = this.instructionPoints.sortBy(_.instruction.order)
 
     // Retrieve hit for each execution point

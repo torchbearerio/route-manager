@@ -13,12 +13,13 @@ import io.torchbearer.routemanager.types.{Route, TBDirectionsResponse}
 object MapboxService {
   def retrieveRoute(route: Route): Option[TBDirectionsResponse] = {
 
+    // NOTE: MapBox is stupid. It expects coordinates as (long, lat)
     val directionResults = new MapboxDirections.Builder()
       .setAccessToken(Constants.MAPBOX_KEY)
-      .setOrigin(Position.fromCoordinates(route.originLat, route.originLong))
-      .setDestination(Position.fromCoordinates(route.destLat, route.destLong))
+      .setOrigin(Position.fromCoordinates(route.originLong, route.originLat))
+      .setDestination(Position.fromCoordinates(route.destLong, route.destLat))
       .setProfile(DirectionsCriteria.PROFILE_DRIVING)
-      .setRadiuses(Array(50, 50))
+      //.setRadiuses(Array(50, 50))
       .setSteps(true)
       .setOverview("false")
       .build()
