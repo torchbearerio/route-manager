@@ -11,7 +11,5 @@ object Constants {
   final val DEFAULT_SALIENCY_ASSIGNMENTS: Int = 5
   final val DEFAULT_DESCRIPTION_ASSIGNMENTS: Int = 5
   final val DEFAULT_DISTANCE: Int = 50
-
-  final val MAPBOX_KEY = "pk.eyJ1IjoiZnJlZHZvbGxtZXIiLCJhIjoiY2l1cHZ1N2oyMDJ2NzJ0bnVxODlia2J6dCJ9.r49K76ufjF8zuO6KO0pk5g"
-
+  final val DEFAULT_PIPELINE: String = "CV-CV"
 }

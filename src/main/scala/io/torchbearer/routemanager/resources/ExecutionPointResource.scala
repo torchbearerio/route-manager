@@ -31,34 +31,14 @@ class ExecutionPointResource(system: ActorSystem) extends RouteManagerStack with
   /**
     * Get description of ExecutionPoint executionPoint by ID
     */
-  get("/:epId/description") {
-    val id = params("epId").toInt
-
-    val saliencyReward = params.get("saliencyReward").map(_.toInt)
-      .getOrElse(Constants.DEFAULT_SALIENCY_REWARD)
-    val descriptionRewrad = params.get("descriptionReward").map(_.toInt)
-      .getOrElse(Constants.DEFAULT_DESCRIPTION_REWARD)
-    val saliencyAssignmentCount = params.get("saliencyAssignmentCount").map(_.toInt)
-      .getOrElse(Constants.DEFAULT_SALIENCY_ASSIGNMENTS)
-    val descriptionAssignmentCount = params.get("descriptionAssignmentCount").map(_.toInt)
-      .getOrElse(Constants.DEFAULT_DESCRIPTION_ASSIGNMENTS)
-    val distance = params.get("distance").map(_.toInt)
-      .getOrElse(Constants.DEFAULT_DISTANCE)
+  get("/:epId/landmark") {
+    val epId = params("epId").toInt
+    val pipeline = params.getOrElse("pipeline", Constants.DEFAULT_PIPELINE)
 
     new AsyncResult {
       val is = Future {
-        val hit = Hit.getHitForExecutionPointId(id, saliencyReward, descriptionRewrad, distance, saliencyAssignmentCount,
-          descriptionAssignmentCount)
-          .getOrElse {
-            halt(404, "Hit not found for this execution point.")
-          }
-
-        val description = hit.computedDescription
-          .getOrElse {
-            halt(404, "No description is available yet")
-          }
-
-        "description" -> description.getRealization
+        val hit = Hit.getHitForExecutionPointId(epId, pipeline) getOrElse halt(200)
+        hit.getSelectedLandmark
       }
     }
   }

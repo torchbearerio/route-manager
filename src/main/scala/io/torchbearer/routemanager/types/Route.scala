@@ -1,14 +1,14 @@
 package io.torchbearer.routemanager.types
 
 import io.torchbearer.ServiceCore.AWSServices.SQS
-import io.torchbearer.ServiceCore.DataModel.{ExecutionPoint, Hit}
+import io.torchbearer.ServiceCore.DataModel.{ExecutionPoint, Hit, Landmark}
 import io.torchbearer.ServiceCore.Redis.RedisClient
-import io.torchbearer.ServiceCore.tyoes.Instruction
 import io.torchbearer.routemanager.{Constants, MapboxService}
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 import org.json4s.jackson.Serialization
 import org.json4s.jackson.Serialization._
+import com.mapbox.services.directions.v5.models.DirectionsRoute
 
 /**
   * Created by fredricvollmer on 1/29/17.
@@ -19,16 +19,13 @@ class Route(
                   val originLong: Double,
                   val destLat: Double,
                   val destLong: Double,
-                  val saliencyReward: Int = Constants.DEFAULT_SALIENCY_REWARD,
-                  val descriptionReward: Int = Constants.DEFAULT_DESCRIPTION_REWARD,
-                  val saliencyAssignmentCount: Int = Constants.DEFAULT_SALIENCY_ASSIGNMENTS,
-                  val descriptionAssignmentCount: Int = Constants.DEFAULT_DESCRIPTION_ASSIGNMENTS,
-                  val distance: Int = Constants.DEFAULT_DISTANCE,
-                  var duration: Double = 0,
-                  val clientUuid: Option[String] = None,
-                  var instructionPoints: List[InstructionPoint] = List()) {
+                  val pipeline: String
+                  ) {
 
   var status: RouteStatus.RouteStatus = RouteStatus.OK
+  var landmarks: Map[Int, Landmark] = Map()
+  var mapboxRoute: Option[TBDirectionsResponse] = None
+  var navigation: Option[Map[String, _]] = None
 
   def ingestRoute(): Unit = {
     // Retrieve directions from Mapbox
@@ -42,43 +39,48 @@ class Route(
 
     val eps = directions.getExecutionPoints()
 
-    // Update route duration
-    this.duration = directions.getDuration
-
     // Retrieve points from db, insert if needed
     val ingestedPoints = ExecutionPoint.ingestExecutionPoints(eps)
 
+    // Retrieve hit for each execution point
+    ingestedPoints.values.par.foreach(p => {
+      val landmark = Hit.getHitForExecutionPointId(p, this.pipeline).flatMap(h => h.getSelectedLandmark)
+
+      // If hit exists, great. Update Instruction.
+      // Otherwise, submit this execution point to Turk Service.
+      landmark match {
+        case Some(lm) => {
+          this.landmarks += (p -> lm)
+        }
+
+        case None => {
+          // Submit execution point to Turk Service
+          /*
+          SQS.submitExecutionPointToTurkService(ip.executionPoint.executionPointId, saliencyReward, descriptionReward,
+            saliencyAssignmentCount, descriptionAssignmentCount, distance)
+          */
+        }
+      }
+    })
+
     // Initialize instructions map
-    val instructions = directions.getInstructions()
+    /*val instructions = directions.getInstructions()
 
     // Merge points and instructions
     val keys = instructions.keySet & ingestedPoints.keySet
     this.instructionPoints = keys.map(k => InstructionPoint(ingestedPoints(k), instructions(k))).toList
 
-    // Order  instruction points by arrival
+    // Order instruction points by arrival
     this.instructionPoints = this.instructionPoints.sortBy(_.instruction.order)
+    */
 
-    // Retrieve hit for each execution point
-    this.instructionPoints.par.foreach(ip => {
-      val hit = Hit.getHitForExecutionPointId(ip.executionPoint.executionPointId, this.saliencyReward,
-        this.descriptionReward, this.distance, this.saliencyAssignmentCount, this.descriptionAssignmentCount)
+    // Attach raw mapbox route object
+    this.mapboxRoute = Some(directions)
 
-      // If hit exists, great. Update Instruction.
-      // Otherwise, submit this execution point to Turk Service.
-      hit match {
-        case Some(existingHit) => {
-          ip.instruction.updateWithHit(existingHit)
-        }
-
-        case None => {
-          // Submit execution point to Turk Service
-          SQS.submitExecutionPointToTurkService(ip.executionPoint.executionPointId, saliencyReward, descriptionReward,
-            saliencyAssignmentCount, descriptionAssignmentCount, distance)
-        }
-      }
-    })
+    // Build navigation object
+    val landmarkDescriptionMap: Map[Int, Option[String]] = this.landmarks.map(lm => lm._1 -> lm._2.description)
+    this.navigation = Some(directions.getMBRoute(ingestedPoints, landmarkDescriptionMap))
   }
-
 }
 
 object Route {
@@ -86,11 +88,9 @@ object Route {
   implicit val formats = DefaultFormats
 
   def apply(originLat: Double, originLong: Double, destLat: Double, destLong: Double,
-            saliencyReward: Int, descriptionReward: Int, saliencyAssignmentCount: Int,
-            descriptionAssignmentCount: Int, distance: Int): Route = {
+            pipeline: String): Route = {
     val uuid = java.util.UUID.randomUUID.toString
-    val route = new Route(uuid, originLat, originLong, destLat, destLong, saliencyReward, descriptionReward,
-      saliencyAssignmentCount, descriptionAssignmentCount, distance)
+    val route = new Route(uuid, originLat, originLong, destLat, destLong, pipeline)
 
     // Process route execution points, retrieve instructions
     route.ingestRoute()

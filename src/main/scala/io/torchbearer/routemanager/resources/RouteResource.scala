@@ -39,27 +39,18 @@ class RouteResource(system: ActorSystem) extends RouteManagerStack with JacksonJ
     val originLong = (parsedBody \ "origin_long").extract[Double]
     val destLat = (parsedBody \ "destination_lat").extract[Double]
     val destLong = (parsedBody \ "destination_long").extract[Double]
-    val saliencyReward = (parsedBody \ "saliency_reward").extractOpt[Int]
-      .getOrElse(Constants.DEFAULT_SALIENCY_REWARD)
-    val descriptionRewrad = (parsedBody \ "description_reward").extractOpt[Int]
-      .getOrElse(Constants.DEFAULT_DESCRIPTION_REWARD)
-    val saliencyAssignmentCount = (parsedBody \ "saliency_assignment_count").extractOpt[Int]
-      .getOrElse(Constants.DEFAULT_SALIENCY_ASSIGNMENTS)
-    val descriptionAssignmentCount = (parsedBody \ "description_assignment_count").extractOpt[Int]
-      .getOrElse(Constants.DEFAULT_DESCRIPTION_ASSIGNMENTS)
-    val distance = (parsedBody \ "distance").extractOpt[Int]
-      .getOrElse(Constants.DEFAULT_DISTANCE)
+    val pipeline = (parsedBody \ "pipeline").extractOpt[String]
+      .getOrElse(Constants.DEFAULT_PIPELINE)
 
     //new AsyncResult() {
       //override val is = Future {
-        val route = Route(originLat, originLong, destLat, destLong, saliencyReward, descriptionRewrad, saliencyAssignmentCount,
-          descriptionAssignmentCount, distance)
+        val route = Route(originLat, originLong, destLat, destLong, pipeline)
 
         if (route.status != RouteStatus.OK) {
           halt(500)
         }
 
-        route.instructionPoints
+        route.navigation
 
       //}
     //}
