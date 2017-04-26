@@ -34,6 +34,8 @@ class TBDirectionsResponse(response: DirectionsResponse) {
 
   def getMBRoute(executionPointIds: Map[(Double, Double, Int), Int], landmarks: Map[Int, Option[String]]): Map[String , _] = {
     val route = response.getRoutes.get(0)
+
+    // NOTE: As per usual, we must reverse the location arrays returned by MapBox as they are in {long, lat} form
     Map(
       "legs" -> route.getLegs.map(l => {
         Map(
@@ -49,7 +51,7 @@ class TBDirectionsResponse(response: DirectionsResponse) {
               "geometry" -> s.getGeometry,
               "maneuver" -> Map(
                 "bearing_after" -> s.getManeuver.getBearingAfter,
-                "location" -> s.getManeuver.getLocation,
+                "location" -> s.getManeuver.getLocation.reverse,
                 "bearing_before" -> s.getManeuver.getBearingBefore,
                 "type" -> s.getManeuver.getType,
                 "instruction" -> s.getManeuver.getInstruction,

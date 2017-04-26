@@ -2,20 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8e827ef5-f648-40be-bc1d-7956402d4646" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/types/Instruction.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/project/target/streams/compile/copyResources/$global/streams/copy-resources" afterPath="$PROJECT_DIR$/project/target/streams/compile/copyResources/$global/streams/copy-resources" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules/route-manager.iml" afterPath="$PROJECT_DIR$/.idea/modules/route-manager.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules/service-core.iml" afterPath="$PROJECT_DIR$/.idea/modules/service-core.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/project/target/streams/compile/compileIncremental/$global/streams/out" afterPath="$PROJECT_DIR$/project/target/streams/compile/compileIncremental/$global/streams/out" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/project/target/streams/compile/copyResources/$global/streams/out" afterPath="$PROJECT_DIR$/project/target/streams/compile/copyResources/$global/streams/out" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/Constants.scala" afterPath="$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/Constants.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/MapboxService.scala" afterPath="$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/MapboxService.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/resources/ExecutionPointResource.scala" afterPath="$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/resources/ExecutionPointResource.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/resources/RouteResource.scala" afterPath="$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/resources/RouteResource.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/types/InstructionPoint.scala" afterPath="$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/types/InstructionPoint.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/types/Route.scala" afterPath="$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/types/Route.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/types/TBDirectionsResponse.scala" afterPath="$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/types/TBDirectionsResponse.scala" />
     </list>
     <ignored path="turk-service.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -78,7 +68,7 @@
       <file leaf-file-name="RouteResource.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/resources/RouteResource.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="347">
+            <state relative-caret-position="864">
               <caret line="46" column="37" selection-start-line="46" selection-start-column="37" selection-end-line="46" selection-end-column="37" />
               <folding />
             </state>
@@ -108,8 +98,8 @@
       <file leaf-file-name="TBDirectionsResponse.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/types/TBDirectionsResponse.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="439">
-              <caret line="45" column="52" selection-start-line="45" selection-start-column="52" selection-end-line="45" selection-end-column="52" />
+            <state relative-caret-position="559">
+              <caret line="49" column="16" selection-start-line="49" selection-start-column="16" selection-end-line="49" selection-end-column="16" />
               <folding>
                 <element signature="e#42#108#0" expanded="true" />
               </folding>
@@ -120,11 +110,9 @@
       <file leaf-file-name="build.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/project/build.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="58">
+            <state relative-caret-position="1176">
               <caret line="61" column="24" selection-start-line="61" selection-start-column="24" selection-end-line="61" selection-end-column="24" />
-              <folding>
-                <element signature="e#0#12#0" expanded="false" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -132,7 +120,7 @@
       <file leaf-file-name="ExecutionPoint.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../service-core/src/main/scala/io/torchbearer/ServiceCore/DataModel/ExecutionPoint.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="239">
+            <state relative-caret-position="4272">
               <caret line="185" column="34" selection-start-line="185" selection-start-column="34" selection-end-line="185" selection-end-column="34" />
               <folding>
                 <marker date="1493098987000" expanded="true" signature="4996:5089" ph="INSERT INTO ExecutionPoints... " />
@@ -144,7 +132,7 @@
       <file leaf-file-name="KeyStore.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../service-core/src/main/scala/io/torchbearer/ServiceCore/AWSServices/KeyStore.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="416">
+            <state relative-caret-position="720">
               <caret line="35" column="41" selection-start-line="35" selection-start-column="41" selection-end-line="35" selection-end-column="41" />
               <folding />
             </state>
@@ -164,7 +152,7 @@
       <file leaf-file-name="MapboxService.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/MapboxService.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="456">
+            <state relative-caret-position="600">
               <caret line="25" column="25" selection-start-line="25" selection-start-column="25" selection-end-line="25" selection-end-column="25" />
               <folding>
                 <element signature="e#37#87#0" expanded="true" />
@@ -176,7 +164,7 @@
       <file leaf-file-name="Route.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/types/Route.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="984">
+            <state relative-caret-position="1632">
               <caret line="68" column="36" selection-start-line="68" selection-start-column="36" selection-end-line="68" selection-end-column="36" />
               <folding>
                 <element signature="e#43#92#0" expanded="true" />
@@ -305,9 +293,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="Scratches" />
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -690,6 +675,9 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
+      <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -1235,7 +1223,7 @@
     </list>
   </component>
   <component name="SbtLocalSettings">
-    <option name="lastUpdateTimestamp" value="1493093825350" />
+    <option name="lastUpdateTimestamp" value="1493174947667" />
     <option name="availableProjects">
       <map>
         <entry>
@@ -1321,12 +1309,13 @@
       <workItem from="1492139547951" duration="831000" />
       <workItem from="1492492757673" duration="2895000" />
       <workItem from="1492971120330" duration="9279000" />
-      <workItem from="1493093803998" duration="8386000" />
+      <workItem from="1493093803998" duration="8984000" />
+      <workItem from="1493174900781" duration="183000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="309937000" />
+    <option name="totallyTimeSpent" value="310718000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1361,7 +1350,7 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2361111" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2361111" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Nl-Palette" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -1650,11 +1639,9 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/project/build.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="58">
+        <state relative-caret-position="1176">
           <caret line="61" column="24" selection-start-line="61" selection-start-column="24" selection-end-line="61" selection-end-column="24" />
-          <folding>
-            <element signature="e#0#12#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1668,7 +1655,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../service-core/src/main/scala/io/torchbearer/ServiceCore/AWSServices/KeyStore.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="416">
+        <state relative-caret-position="720">
           <caret line="35" column="41" selection-start-line="35" selection-start-column="41" selection-end-line="35" selection-end-column="41" />
           <folding />
         </state>
@@ -1676,7 +1663,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/MapboxService.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="456">
+        <state relative-caret-position="600">
           <caret line="25" column="25" selection-start-line="25" selection-start-column="25" selection-end-line="25" selection-end-column="25" />
           <folding>
             <element signature="e#37#87#0" expanded="true" />
@@ -1686,7 +1673,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../service-core/src/main/scala/io/torchbearer/ServiceCore/DataModel/ExecutionPoint.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="239">
+        <state relative-caret-position="4272">
           <caret line="185" column="34" selection-start-line="185" selection-start-column="34" selection-end-line="185" selection-end-column="34" />
           <folding>
             <marker date="1493098987000" expanded="true" signature="4996:5089" ph="INSERT INTO ExecutionPoints... " />
@@ -1712,7 +1699,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/types/Route.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="984">
+        <state relative-caret-position="1632">
           <caret line="68" column="36" selection-start-line="68" selection-start-column="36" selection-end-line="68" selection-end-column="36" />
           <folding>
             <element signature="e#43#92#0" expanded="true" />
@@ -1722,7 +1709,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/resources/RouteResource.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="347">
+        <state relative-caret-position="864">
           <caret line="46" column="37" selection-start-line="46" selection-start-column="37" selection-end-line="46" selection-end-column="37" />
           <folding />
         </state>
@@ -1730,8 +1717,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/io/torchbearer/routemanager/types/TBDirectionsResponse.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="439">
-          <caret line="45" column="52" selection-start-line="45" selection-start-column="52" selection-end-line="45" selection-end-column="52" />
+        <state relative-caret-position="559">
+          <caret line="49" column="16" selection-start-line="49" selection-start-column="16" selection-end-line="49" selection-end-column="16" />
           <folding>
             <element signature="e#42#108#0" expanded="true" />
           </folding>
