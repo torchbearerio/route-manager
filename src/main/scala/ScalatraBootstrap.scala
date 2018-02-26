@@ -6,12 +6,13 @@ import _root_.akka.actor.{ActorSystem, Props}
 import io.torchbearer.ServiceCore.TorchbearerDB
 import io.torchbearer.routemanager.resources.{ExecutionPointResource, RouteResource}
 
+import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration._
 
 class ScalatraBootstrap extends LifeCycle {
 
   val system = ActorSystem()
-  implicit val executor = system.dispatcher
+  implicit val executor: ExecutionContextExecutor = system.dispatcher
 
   override def init(context: ServletContext) {
     // Start REST servers

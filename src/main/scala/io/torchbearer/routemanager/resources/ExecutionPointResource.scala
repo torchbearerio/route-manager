@@ -1,11 +1,16 @@
 package io.torchbearer.routemanager.resources
 
+import java.sql.Timestamp
+
 import io.torchbearer.ServiceCore.DataModel.{ExecutionPoint, Hit}
 import io.torchbearer.routemanager.{Constants, RouteManagerStack}
 import org.json4s.{DefaultFormats, Formats}
+import io.torchbearer.ServiceCore.{Constants => CoreConstants}
 import org.scalatra._
 import org.scalatra.json.JacksonJsonSupport
 import _root_.akka.actor.ActorSystem
+import io.torchbearer.ServiceCore.AWSServices.SFN
+import org.scalatra.ActionResult._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,8 +42,8 @@ class ExecutionPointResource(system: ActorSystem) extends RouteManagerStack with
 
     new AsyncResult {
       val is = Future {
-        val hit = Hit.getHitForExecutionPointId(epId, pipeline) getOrElse halt(200)
-        hit.getSelectedLandmark
+        val hit = Hit.getHitForExecutionPointId(epId, pipeline) getOrElse halt(404)
+        hit.getSelectedLandmark getOrElse halt(404)
       }
     }
   }
@@ -73,6 +78,51 @@ class ExecutionPointResource(system: ActorSystem) extends RouteManagerStack with
           "count" -> count,
           "points" -> points
         )
+      }
+    }
+  }
+  /**
+    * Manually submit an execution point at given location and bearing for given pipeline.
+    */
+  post("/") {
+    val lat = (parsedBody \ "lat").extract[Double]
+    val long = (parsedBody \ "long").extract[Double]
+    val bearing = (parsedBody \ "bearing").extract[Int]
+    val pipeline = (parsedBody \ "pipeline").extract[String]
+    val shouldStartExecution = (parsedBody \ "startPipeline").extractOrElse(true)
+
+    new AsyncResult {
+      val is = Future {
+        val newEp = ExecutionPoint(lat, long, bearing)
+
+        // Insert ExecutionPoint if needed
+        ExecutionPoint.insertExecutionPointIfNotExists(newEp)
+
+        // Get id for this execution point now that we know it's in DB
+        val epId = ExecutionPoint.getExecutionPoint(lat, long, bearing)
+          .map(ep => ep.executionPointId)
+          .getOrElse({halt(500, "Error creating ExecutionPoint")})
+
+        // Get Hit for this ExecutionPoint and given pipeline
+        val hit = Hit.getHitForExecutionPointId(epId, pipeline)
+
+        // If Hit exists, great, no need to do anything!
+        // If not, create Hit and send it down the pipeline
+        if (hit.isEmpty) {
+          var newHit = Hit(epId, pipeline)
+          Hit.insertHit(newHit)
+          newHit = Hit.getHitForExecutionPointId(epId, pipeline)
+            .getOrElse({halt(500, "Couldn't find newly created hit")})
+
+          if (shouldStartExecution) {
+            val pipelineARN = SFN.getStateMachineArnForPipeline(pipeline)
+            SFN.startExecution(pipelineARN, "epId" -> epId, "hitId" -> newHit.hitId)
+            newHit.updateStatus(CoreConstants.HIT_STATUS_PROCESSING)
+            newHit.updateProcessingStartTime(new Timestamp(System.currentTimeMillis()))
+          }
+        }
+
+        Created()
       }
     }
   }

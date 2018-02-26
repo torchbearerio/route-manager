@@ -1,7 +1,6 @@
 package io.torchbearer.routemanager
 
 import com.mapbox.services.commons.models.Position
-import com.mapbox.services.directions.v5.models.DirectionsResponse
 import com.mapbox.services.directions.v5.{DirectionsCriteria, MapboxDirections}
 import io.torchbearer.ServiceCore.AWSServices.KeyStore
 import io.torchbearer.routemanager.types.{Instruction, Route, TBDirectionsResponse}
@@ -11,7 +10,7 @@ import io.torchbearer.routemanager.types.{Instruction, Route, TBDirectionsRespon
   * Created by fredricvollmer on 1/30/17.
   */
 object MapboxService {
-  lazy val mapboxKey = KeyStore.getKey("mapbox-key")
+  val mapboxKey = KeyStore.getKey("mapbox-key")
 
   def retrieveRoute(route: Route): Option[TBDirectionsResponse] = {
 

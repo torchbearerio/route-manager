@@ -8,6 +8,9 @@ import ScalateKeys._
 import sbtassembly.AssemblyPlugin._
 import sbtassembly.AssemblyKeys._
 import sbtassembly.{MergeStrategy, PathList}
+import sbtdocker.DockerPlugin.autoImport._
+import sbtdocker.DockerKeys.{docker, dockerfile}
+import sbtdocker.DockerPlugin
 import com.earldouglas.xwp.JettyPlugin
 import com.earldouglas.xwp.JettyPlugin.autoImport._
 import com.earldouglas.xwp.ContainerPlugin.autoImport._
@@ -18,6 +21,22 @@ object RouteManagerBuild extends Build {
   val Version = "0.1.0-SNAPSHOT"
   val ScalaVersion = "2.11.8"
   val ScalatraVersion = "2.4.1"
+
+  // ------------------------------------------
+  // Docker Builder
+  // ------------------------------------------
+  val dockerSettings = dockerfile in docker := {
+    // The assembly task generates a fat JAR file
+    val artifact: File = assembly.value
+    val artifactTargetPath = s"/target/${artifact.name}"
+
+    new Dockerfile {
+      from("java")
+      add("build.jar", artifactTargetPath)
+      expose(41011)
+      entryPoint("java", "-jar", artifactTargetPath)
+    }
+  }
 
   val tsAssemblySettings = assemblySettings ++ Seq(
     // copy web resources to /webapp folder
@@ -46,7 +65,7 @@ object RouteManagerBuild extends Build {
   lazy val project = Project (
     "route-manager",
     file("."),
-    settings = ScalatraPlugin.scalatraSettings ++ scalateSettings ++ tsAssemblySettings ++ Seq(
+    settings = ScalatraPlugin.scalatraSettings ++ dockerSettings ++ scalateSettings ++ tsAssemblySettings ++ Seq(
       organization := Organization,
       name := Name,
       version := Version,
@@ -76,6 +95,7 @@ object RouteManagerBuild extends Build {
         "xerces" % "xercesImpl" % "2.9.1",
         "ca.juliusdavies" % "not-yet-commons-ssl" % "0.3.9",
         "com.mapbox.mapboxsdk" % "mapbox-java-services" % "1.3.1",
+        "com.javadocmd" % "simplelatlng" % "1.3.1",
         "net.ettinsmoor" % "java-aws-mturk" % "1.6.2" excludeAll(
           ExclusionRule(organization = "org.apache.commons", name = "not-yet-commons-ssl"),
           ExclusionRule(organization = "apache-xerces", name = "resolver"),
@@ -102,5 +122,8 @@ object RouteManagerBuild extends Build {
       },
       mainClass in (Compile, run) := Some("io.torchbearer.routemanager.JettyLauncher")
     )
-  ).dependsOn(core).enablePlugins(JettyPlugin)
+  )
+    .dependsOn(core)
+    .enablePlugins(JettyPlugin)
+    .enablePlugins(DockerPlugin)
 }

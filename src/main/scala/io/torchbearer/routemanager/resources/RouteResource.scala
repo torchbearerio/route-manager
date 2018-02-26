@@ -42,18 +42,22 @@ class RouteResource(system: ActorSystem) extends RouteManagerStack with JacksonJ
     val pipeline = (parsedBody \ "pipeline").extractOpt[String]
       .getOrElse(Constants.DEFAULT_PIPELINE)
 
-    //new AsyncResult() {
-      //override val is = Future {
+    println(s"Route request for ($originLat, $originLong) received.")
+
+    new AsyncResult() {
+      override val is = Future {
         val route = Route(originLat, originLong, destLat, destLong, pipeline)
 
         if (route.status != RouteStatus.OK) {
           halt(500)
         }
 
+        println(s"Route request for ($originLat, $originLong) processed.")
+
         route.navigation
 
-      //}
-    //}
+      }
+    }
   }
 
   /*

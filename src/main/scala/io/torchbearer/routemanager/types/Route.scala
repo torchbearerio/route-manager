@@ -1,14 +1,12 @@
 package io.torchbearer.routemanager.types
 
-import io.torchbearer.ServiceCore.AWSServices.SQS
+import io.torchbearer.ServiceCore.AWSServices.{SFN, SQS}
 import io.torchbearer.ServiceCore.DataModel.{ExecutionPoint, Hit, Landmark}
 import io.torchbearer.ServiceCore.Redis.RedisClient
+import io.torchbearer.ServiceCore.{Constants => CoreConstants}
+import io.torchbearer.ServiceCore.Utils.currentTimestamp
 import io.torchbearer.routemanager.{Constants, MapboxService}
 import org.json4s._
-import org.json4s.jackson.JsonMethods._
-import org.json4s.jackson.Serialization
-import org.json4s.jackson.Serialization._
-import com.mapbox.services.directions.v5.models.DirectionsRoute
 
 /**
   * Created by fredricvollmer on 1/29/17.
@@ -42,44 +40,39 @@ class Route(
     // Retrieve points from db, insert if needed
     val ingestedPoints = ExecutionPoint.ingestExecutionPoints(eps)
 
-    // Retrieve hit for each execution point
-    ingestedPoints.values.par.foreach(p => {
-      val landmark = Hit.getHitForExecutionPointId(p, this.pipeline).flatMap(h => h.getSelectedLandmark)
+    // Retrieve hit and selected landmark for each execution point
+    ingestedPoints.values.par.foreach(epId => {
+      val hit = Hit.getHitForExecutionPointId(epId, this.pipeline)
 
-      // If hit exists, great. Update Instruction.
-      // Otherwise, submit this execution point to Turk Service.
-      landmark match {
-        case Some(lm) => {
-          this.landmarks += (p -> lm)
+      // If hit exists, great. Update Instruction with Hit's selected landmark.
+      // If no selected landmark, maybe hit is still processing...app will poll for update.
+      hit match {
+        case Some(h) => {
+          val landmark = h.getSelectedLandmark
+          if (landmark.isDefined) {
+            this.landmarks += (epId -> landmark.get)
+          }
         }
 
         case None => {
-          // Submit execution point to Turk Service
-          /*
-          SQS.submitExecutionPointToTurkService(ip.executionPoint.executionPointId, saliencyReward, descriptionReward,
-            saliencyAssignmentCount, descriptionAssignmentCount, distance)
-          */
+          // Otherwise, create Hit and submit this execution point to pipeline StepFunction
+          val newHit = Hit(epId, pipeline)
+          newHit.status = CoreConstants.HIT_STATUS_PROCESSING
+          newHit.processingStartTime = Some(currentTimestamp)
+          Hit.insertHit(newHit)
+          val hitId = Hit.getHitForExecutionPointId(epId, pipeline).map(h => h.hitId)
+
+          val pipelineARN = SFN.getStateMachineArnForPipeline(pipeline)
+          SFN.startExecution(pipelineARN, "epId" -> epId, "hitId" -> hitId.getOrElse(0))
         }
       }
     })
-
-    // Initialize instructions map
-    /*val instructions = directions.getInstructions()
-
-    // Merge points and instructions
-    val keys = instructions.keySet & ingestedPoints.keySet
-    this.instructionPoints = keys.map(k => InstructionPoint(ingestedPoints(k), instructions(k))).toList
-
-    // Order instruction points by arrival
-    this.instructionPoints = this.instructionPoints.sortBy(_.instruction.order)
-    */
 
     // Attach raw mapbox route object
     this.mapboxRoute = Some(directions)
 
     // Build navigation object
-    val landmarkDescriptionMap: Map[Int, Option[String]] = this.landmarks.map(lm => lm._1 -> lm._2.description)
-    this.navigation = Some(directions.getMBRoute(ingestedPoints, landmarkDescriptionMap))
+    this.navigation = Some(directions.getMBRoute(ingestedPoints, this.landmarks))
   }
 }
 

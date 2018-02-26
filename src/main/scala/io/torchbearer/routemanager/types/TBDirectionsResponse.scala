@@ -1,6 +1,10 @@
 package io.torchbearer.routemanager.types
+
+import com.javadocmd.simplelatlng.util.LengthUnit
 import com.mapbox.services.directions.v5.models.DirectionsResponse
-import io.torchbearer.ServiceCore.DataModel.ExecutionPoint
+import io.torchbearer.ServiceCore.DataModel.{ExecutionPoint, Landmark}
+import io.torchbearer.ServiceCore.Constants
+import com.javadocmd.simplelatlng.{LatLng, LatLngTool}
 
 import scala.collection.JavaConversions._
 import scala.collection.immutable.ListMap
@@ -12,6 +16,7 @@ class TBDirectionsResponse(response: DirectionsResponse) {
 
   /**
     * Returns a list of ExecutionPoints
+    *
     * @return
     */
   def getExecutionPoints(): List[ExecutionPoint] = {
@@ -20,19 +25,37 @@ class TBDirectionsResponse(response: DirectionsResponse) {
 
     steps.map(step => {
       val maneuver = step.getManeuver
-
       val bearing = maneuver.getBearingBefore.toInt
+
+      val executionPointType = if (maneuver.getType == "arrive") {
+        maneuver.getModifier match {
+          case "left" => Constants.EXECUTION_POINT_TYPE_DESTINATION_LEFT
+          case "right" => Constants.EXECUTION_POINT_TYPE_DESTINATION_RIGHT
+          case _ => Constants.EXECUTION_POINT_TYPE_MANEUVER
+        }
+      }
+      else {
+        Constants.EXECUTION_POINT_TYPE_MANEUVER
+      }
 
       // NOTE: MapBox is really stupid, and reverses {lat, long} to {long, lat}
       val lat = maneuver.getLocation()(1)
       val long = maneuver.getLocation()(0)
 
-      ExecutionPoint(lat, long, bearing)
+      val thisPoint = new LatLng(lat, long)
+      val intersectionDistances = step.getIntersections.map(i => {
+          val intersectionPoint = new LatLng(i.getLocation()(1), i.getLocation()(0))
+          LatLngTool.distance(intersectionPoint, thisPoint, LengthUnit.MILE)
+      }).filterNot(d => d == 0)
+
+      val closestIntersectionDistance = if (intersectionDistances.nonEmpty) intersectionDistances.min else 9999.0
+
+      ExecutionPoint(lat, long, bearing, executionPointType, closestIntersectionDistance)
     })
       .toList
   }
 
-  def getMBRoute(executionPointIds: Map[(Double, Double, Int), Int], landmarks: Map[Int, Option[String]]): Map[String , _] = {
+  def getMBRoute(executionPointMap: Map[(Double, Double, Int), Int], landmarkMap: Map[Int, Landmark]): Map[String, _] = {
     val route = response.getRoutes.get(0)
 
     // NOTE: As per usual, we must reverse the location arrays returned by MapBox as they are in {long, lat} form
@@ -40,12 +63,12 @@ class TBDirectionsResponse(response: DirectionsResponse) {
       "legs" -> route.getLegs.map(l => {
         Map(
           "steps" -> l.getSteps.map(s => {
-            val epId = executionPointIds((
+            val epId = executionPointMap((
               s.getManeuver.getLocation()(1),
               s.getManeuver.getLocation()(0),
               s.getManeuver.getBearingBefore.toInt
-              ))
-            val landmark = landmarks.get(epId).flatten
+            ))
+            val landmark = landmarkMap.get(epId)
 
             Map(
               "geometry" -> s.getGeometry,
@@ -61,13 +84,15 @@ class TBDirectionsResponse(response: DirectionsResponse) {
               "distance" -> s.getDistance,
               "duration" -> s.getDuration,
               "name" -> s.getName,
-              "mode" -> s.getMode
+              "mode" -> s.getMode,
+              "executionPointId" -> epId
             )
           }),
           "distance" -> l.getDistance,
           "duration" -> l.getDuration,
           "summary" -> l.getSummary
-        )}
+        )
+      }
       ),
       "duration" -> route.getDuration,
       "distance" -> route.getDistance,
@@ -77,6 +102,7 @@ class TBDirectionsResponse(response: DirectionsResponse) {
 
   /**
     * Returns a map of (lat,long,bearing) onto Instruction
+    *
     * @return
     */
   def getInstructions(): Map[(Double, Double, Int), Instruction] = {

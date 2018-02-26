@@ -1,7 +1,13 @@
 #!/bin/bash
 
-# Build jar
-sbt clean update assembly
+# Build jar and Dockerfile
+sbt clean update docker
+
+rm -f target/build.zip
+
+# ZIP it up
+zip -j target/build.zip ./target/build.jar ./target/docker/Dockerfile ./Dockerrun.aws.json
+zip -r target/build.zip ./.ebextensions
 
 # Deploy to EB
 eb deploy
