@@ -90,10 +90,12 @@ class ExecutionPointResource(system: ActorSystem) extends RouteManagerStack with
     val bearing = (parsedBody \ "bearing").extract[Int]
     val pipeline = (parsedBody \ "pipeline").extract[String]
     val shouldStartExecution = (parsedBody \ "startPipeline").extractOrElse(true)
+    val sampleSet = (parsedBody \ "sampleSet").extractOpt[String]
 
     new AsyncResult {
       val is = Future {
         val newEp = ExecutionPoint(lat, long, bearing)
+        newEp.sampleSet = sampleSet
 
         // Insert ExecutionPoint if needed
         ExecutionPoint.insertExecutionPointIfNotExists(newEp)
