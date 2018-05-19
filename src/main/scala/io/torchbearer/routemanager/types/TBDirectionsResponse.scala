@@ -1,7 +1,7 @@
 package io.torchbearer.routemanager.types
 
 import com.javadocmd.simplelatlng.util.LengthUnit
-import com.mapbox.services.directions.v5.models.DirectionsResponse
+import com.mapbox.api.directions.v5.models.DirectionsResponse
 import io.torchbearer.ServiceCore.DataModel.{ExecutionPoint, Landmark}
 import io.torchbearer.ServiceCore.Constants
 import com.javadocmd.simplelatlng.{LatLng, LatLngTool}
@@ -20,15 +20,15 @@ class TBDirectionsResponse(response: DirectionsResponse) {
     * @return
     */
   def getExecutionPoints(): List[ExecutionPoint] = {
-    val route = response.getRoutes.get(0)
-    val steps = route.getLegs.get(0).getSteps
+    val route = response.routes.get(0)
+    val steps = route.legs.get(0).steps
 
     steps.map(step => {
-      val maneuver = step.getManeuver
-      val bearing = maneuver.getBearingBefore.toInt
+      val maneuver = step.maneuver
+      val bearing = maneuver.bearingBefore.toInt
 
-      val executionPointType = if (maneuver.getType == "arrive") {
-        maneuver.getModifier match {
+      val executionPointType = if (maneuver.`type` == "arrive") {
+        maneuver.modifier match {
           case "left" => Constants.EXECUTION_POINT_TYPE_DESTINATION_LEFT
           case "right" => Constants.EXECUTION_POINT_TYPE_DESTINATION_RIGHT
           case _ => Constants.EXECUTION_POINT_TYPE_MANEUVER
@@ -38,13 +38,12 @@ class TBDirectionsResponse(response: DirectionsResponse) {
         Constants.EXECUTION_POINT_TYPE_MANEUVER
       }
 
-      // NOTE: MapBox is really stupid, and reverses {lat, long} to {long, lat}
-      val lat = maneuver.getLocation()(1)
-      val long = maneuver.getLocation()(0)
+      val lat = maneuver.location.latitude
+      val long = maneuver.location.longitude
 
       val thisPoint = new LatLng(lat, long)
-      val intersectionDistances = step.getIntersections.map(i => {
-          val intersectionPoint = new LatLng(i.getLocation()(1), i.getLocation()(0))
+      val intersectionDistances = step.intersections.map(i => {
+          val intersectionPoint = new LatLng(i.location.latitude, i.location.longitude)
           LatLngTool.distance(intersectionPoint, thisPoint, LengthUnit.MILE)
       }).filterNot(d => d == 0)
 
@@ -56,47 +55,46 @@ class TBDirectionsResponse(response: DirectionsResponse) {
   }
 
   def getMBRoute(executionPointMap: Map[(Double, Double, Int), Int], landmarkMap: Map[Int, Landmark]): Map[String, _] = {
-    val route = response.getRoutes.get(0)
+    val route = response.routes.get(0)
 
-    // NOTE: As per usual, we must reverse the location arrays returned by MapBox as they are in {long, lat} form
     Map(
-      "legs" -> route.getLegs.map(l => {
+      "legs" -> route.legs.map(l => {
         Map(
-          "steps" -> l.getSteps.map(s => {
+          "steps" -> l.steps.map(s => {
             val epId = executionPointMap((
-              s.getManeuver.getLocation()(1),
-              s.getManeuver.getLocation()(0),
-              s.getManeuver.getBearingBefore.toInt
+              s.maneuver.location.latitude,
+              s.maneuver.location.longitude,
+              s.maneuver.bearingBefore.toInt
             ))
             val landmark = landmarkMap.get(epId)
 
             Map(
-              "geometry" -> s.getGeometry,
+              "geometry" -> s.geometry,
               "maneuver" -> Map(
-                "bearing_after" -> s.getManeuver.getBearingAfter,
-                "location" -> s.getManeuver.getLocation.reverse,
-                "bearing_before" -> s.getManeuver.getBearingBefore,
-                "type" -> s.getManeuver.getType,
-                "instruction" -> s.getManeuver.getInstruction,
+                "bearing_after" -> s.maneuver.bearingAfter,
+                "location" -> List(s.maneuver.location.latitude, s.maneuver.location.longitude),
+                "bearing_before" -> s.maneuver.bearingBefore,
+                "type" -> s.maneuver.`type`,
+                "instruction" -> s.maneuver.instruction,
                 "execution_point" -> epId,
                 "landmark" -> landmark
               ),
-              "distance" -> s.getDistance,
-              "duration" -> s.getDuration,
-              "name" -> s.getName,
-              "mode" -> s.getMode,
+              "distance" -> s.distance,
+              "duration" -> s.duration,
+              "name" -> s.name,
+              "mode" -> s.mode,
               "executionPointId" -> epId
             )
           }),
-          "distance" -> l.getDistance,
-          "duration" -> l.getDuration,
-          "summary" -> l.getSummary
+          "distance" -> l.distance,
+          "duration" -> l.duration,
+          "summary" -> l.summary
         )
       }
       ),
-      "duration" -> route.getDuration,
-      "distance" -> route.getDistance,
-      "geometry" -> route.getGeometry
+      "duration" -> route.duration,
+      "distance" -> route.distance,
+      "geometry" -> route.geometry
     )
   }
 
@@ -106,16 +104,16 @@ class TBDirectionsResponse(response: DirectionsResponse) {
     * @return
     */
   def getInstructions(): Map[(Double, Double, Int), Instruction] = {
-    val route = response.getRoutes.get(0)
-    val steps = route.getLegs.get(0).getSteps
+    val route = response.routes.get(0)
+    val steps = route.legs.get(0).steps
 
     steps.zipWithIndex.map { case (step, index) =>
-      val maneuver = step.getManeuver
+      val maneuver = step.maneuver
 
-      val action = maneuver.getInstruction
-      val bearing = maneuver.getBearingBefore.toInt
-      val lat = maneuver.getLocation()(1)
-      val long = maneuver.getLocation()(0)
+      val action = maneuver.instruction
+      val bearing = maneuver.bearingBefore.toInt
+      val lat = maneuver.location.latitude
+      val long = maneuver.location.longitude
 
       val inst = Instruction(action, index, index == steps.length - 1)
 
@@ -124,9 +122,9 @@ class TBDirectionsResponse(response: DirectionsResponse) {
       .toMap
   }
 
-  def getDuration = response.getRoutes.get(0).getDuration
+  def getDuration = response.routes.get(0).duration
 
-  def getDistance = response.getRoutes.get(0).getDistance
+  def getDistance = response.routes.get(0).distance
 
-  def getStatus = response.getCode
+  def getStatus = response.code
 }

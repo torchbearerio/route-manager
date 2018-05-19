@@ -17,6 +17,7 @@ class Route(
                   val originLong: Double,
                   val destLat: Double,
                   val destLong: Double,
+                  val initialBearing: Option[Double],
                   val pipeline: String
                   ) {
 
@@ -80,10 +81,10 @@ object Route {
   private val redis = RedisClient.getClient
   implicit val formats = DefaultFormats
 
-  def apply(originLat: Double, originLong: Double, destLat: Double, destLong: Double,
+  def apply(originLat: Double, originLong: Double, destLat: Double, destLong: Double, initialBearing: Option[Double],
             pipeline: String): Route = {
     val uuid = java.util.UUID.randomUUID.toString
-    val route = new Route(uuid, originLat, originLong, destLat, destLong, pipeline)
+    val route = new Route(uuid, originLat, originLong, destLat, destLong, initialBearing, pipeline)
 
     // Process route execution points, retrieve instructions
     route.ingestRoute()

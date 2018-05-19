@@ -39,6 +39,7 @@ class RouteResource(system: ActorSystem) extends RouteManagerStack with JacksonJ
     val originLong = (parsedBody \ "origin_long").extract[Double]
     val destLat = (parsedBody \ "destination_lat").extract[Double]
     val destLong = (parsedBody \ "destination_long").extract[Double]
+    val bearing = (parsedBody \ "bearing").extractOpt[Double]
     val pipeline = (parsedBody \ "pipeline").extractOpt[String]
       .getOrElse(Constants.DEFAULT_PIPELINE)
 
@@ -46,7 +47,7 @@ class RouteResource(system: ActorSystem) extends RouteManagerStack with JacksonJ
 
     new AsyncResult() {
       override val is = Future {
-        val route = Route(originLat, originLong, destLat, destLong, pipeline)
+        val route = Route(originLat, originLong, destLat, destLong, bearing, pipeline)
 
         if (route.status != RouteStatus.OK) {
           halt(500)

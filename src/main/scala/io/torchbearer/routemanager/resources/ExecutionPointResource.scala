@@ -42,8 +42,8 @@ class ExecutionPointResource(system: ActorSystem) extends RouteManagerStack with
 
     new AsyncResult {
       val is = Future {
-        val hit = Hit.getHitForExecutionPointId(epId, pipeline) getOrElse halt(404)
-        hit.getSelectedLandmark getOrElse halt(404)
+        val hit = Hit.getHitForExecutionPointId(epId, pipeline) getOrElse halt(400)
+        hit.getSelectedLandmark getOrElse halt(400)
       }
     }
   }

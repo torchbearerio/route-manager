@@ -94,7 +94,7 @@ object RouteManagerBuild extends Build {
         "org.json4s"   %% "json4s-jackson" % "3.3.0",
         "xerces" % "xercesImpl" % "2.9.1",
         "ca.juliusdavies" % "not-yet-commons-ssl" % "0.3.9",
-        "com.mapbox.mapboxsdk" % "mapbox-java-services" % "1.3.1",
+        "com.mapbox.mapboxsdk" % "mapbox-sdk-services" % "3.1.0",
         "com.javadocmd" % "simplelatlng" % "1.3.1",
         "net.ettinsmoor" % "java-aws-mturk" % "1.6.2" excludeAll(
           ExclusionRule(organization = "org.apache.commons", name = "not-yet-commons-ssl"),
