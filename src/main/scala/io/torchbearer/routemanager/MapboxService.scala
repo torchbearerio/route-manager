@@ -19,13 +19,16 @@ object MapboxService {
       .accessToken(mapboxKey)
       .origin(Point.fromLngLat(route.originLong, route.originLat))
       .destination(Point.fromLngLat(route.destLong, route.destLat))
-      .radiuses(100)
+      .radiuses(100, 100)
       .profile(DirectionsCriteria.PROFILE_DRIVING)
       .steps(true)
       .overview("false")
 
     if (route.initialBearing.isDefined) {
-      directionsRequest.addBearing(route.initialBearing.get, 60.0)
+      // Specify heading restriction on origin waypoint
+      directionsRequest.addBearing(route.initialBearing.get, 45.0)
+      // We don't care about approach bearing of destination waypoint
+      directionsRequest.addBearing(null, null)
     }
 
     val directionsResponse = directionsRequest
@@ -33,6 +36,7 @@ object MapboxService {
       .executeCall()
 
     if (!directionsResponse.isSuccessful) {
+      print(s"Error fetching route form MapBox: ${directionsResponse.message}")
       return None
     }
 

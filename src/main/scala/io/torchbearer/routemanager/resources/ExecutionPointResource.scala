@@ -10,7 +10,6 @@ import org.scalatra._
 import org.scalatra.json.JacksonJsonSupport
 import _root_.akka.actor.ActorSystem
 import io.torchbearer.ServiceCore.AWSServices.SFN
-import org.scalatra.ActionResult._
 
 import scala.concurrent.{ExecutionContext, Future}
 
