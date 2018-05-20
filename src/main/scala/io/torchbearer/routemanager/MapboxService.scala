@@ -20,6 +20,7 @@ object MapboxService {
       .origin(Point.fromLngLat(route.originLong, route.originLat))
       .destination(Point.fromLngLat(route.destLong, route.destLat))
       .radiuses(100, 100)
+      .geometries("polyline")
       .profile(DirectionsCriteria.PROFILE_DRIVING)
       .steps(true)
       .overview("false")
