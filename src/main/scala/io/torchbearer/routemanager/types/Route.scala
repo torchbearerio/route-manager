@@ -58,13 +58,17 @@ class Route(
         case None => {
           // Otherwise, create Hit and submit this execution point to pipeline StepFunction
           val newHit = Hit(epId, pipeline)
-          newHit.status = CoreConstants.HIT_STATUS_PROCESSING
+          newHit.status = if (pipeline == CoreConstants.PIPELINES_RAW) CoreConstants.HIT_STATUS_COMPLETE else CoreConstants.HIT_STATUS_PROCESSING
           newHit.processingStartTime = Some(currentTimestamp)
           Hit.insertHit(newHit)
-          val hitId = Hit.getHitForExecutionPointId(epId, pipeline).map(h => h.hitId)
 
-          val pipelineARN = SFN.getStateMachineArnForPipeline(pipeline)
-          SFN.startExecution(pipelineARN, "epId" -> epId, "hitId" -> hitId.getOrElse(0))
+          // If this is 'RAW' pipeline, it requires no processing
+          // (It just returns raw Mapbox directions)
+          if (pipeline != CoreConstants.PIPELINES_RAW) {
+            val hitId = Hit.getHitForExecutionPointId(epId, pipeline).map(h => h.hitId)
+            val pipelineARN = SFN.getStateMachineArnForPipeline(pipeline)
+            SFN.startExecution(pipelineARN, "epId" -> epId, "hitId" -> hitId.getOrElse(0))
+          }
         }
       }
     })
